@@ -35,7 +35,7 @@ mongoose.connect(MONGO_URI)
 // ✅ API routes
 app.get("/api/exchange-rate", exchangeRate);
 app.post("/api/initiate-payment", initiatePayment);
-app.get("/api/payment/callback", paymentCallback);
+// app.get("/api/payment/callback", paymentCallback);
 app.get("/api/verify-payment", verifyPayment);
 
 // ✅ Start server
