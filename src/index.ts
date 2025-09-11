@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import { exchangeRate, initiatePayment, paymentCallback, verifyPayment } from "./controllers/formController";
+import { exchangeRate, initiatePayment, verifyPayment } from "./controllers/formController";
 
 dotenv.config();
 
@@ -60,7 +60,7 @@ if (cluster.isMaster) {
   // ✅ API routes
   app.get("/api/exchange-rate", exchangeRate);
   app.post("/api/initiate-payment", initiatePayment);
-  app.get("/api/payment/callback", paymentCallback);
+  // app.get("/api/payment/callback", paymentCallback);
   app.get("/api/verify-payment", verifyPayment);
 
   // ✅ Start server
