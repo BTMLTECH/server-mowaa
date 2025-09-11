@@ -6,7 +6,7 @@ import Payment from "../model/Payment";
 import { sendEmail } from "../util/emailUtil";
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
-const BACKEND_URL = process.env.BACKEND_URL;
+// const BACKEND_URL = process.env.BACKEND_URL;
 const PAYSTACK_SECRET_KEY = (process.env.PAYSTACK_SECRET_KEY || "").trim();
 
 
