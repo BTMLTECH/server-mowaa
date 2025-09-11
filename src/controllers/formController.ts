@@ -54,7 +54,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
         amount: paystackAmount,
         currency: currency || "NGN",
         metadata: { name },
-        callback_url: `${BACKEND_URL}/api/payment/callback`,
+        callback_url: 'https://server-mowaa.onrender.com/api/payment/callback'
       },
       {
         headers: {
