@@ -53,7 +53,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
         amount: paystackAmount,
         currency: currency || "NGN",
         metadata: { name },
-        callback_url: "http://localhost:5000/api/payment/callback",
+        callback_url: `${FRONTEND_URL}/api/payment/callback`,
       },
       {
         headers: {
