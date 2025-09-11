@@ -91,10 +91,10 @@ export const paymentCallback = async (req: Request, res: Response) => {
   try {
     let reference = req.query.reference || req.query.trxref;
 
-    if (Array.isArray(reference)) reference = reference[0];
-    if (!reference || typeof reference !== "string") {
-      return res.redirect(`${FRONTEND_URL}/payment/failed`);
-    }
+    // if (Array.isArray(reference)) reference = reference[0];
+    // if (!reference || typeof reference !== "string") {
+    //   return res.redirect(`${FRONTEND_URL}/payment/failed`);
+    // }
 
 
     const response = await axios.get(
@@ -133,9 +133,9 @@ export const paymentCallback = async (req: Request, res: Response) => {
         { formData, cartItems, totalAmount, currency}
       );
 
-      // return res.redirect(
-      //   `${FRONTEND_URL}/payment/success?reference=${reference}`
-      // );
+      return res.redirect(
+        `${FRONTEND_URL}/payment/success?reference=${reference}`
+      );
     }
 
     payment.status = "failed";
