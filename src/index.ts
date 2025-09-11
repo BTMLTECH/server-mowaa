@@ -6,9 +6,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { exchangeRate, initiatePayment, paymentCallback, paystackWebhook, verifyPayment } from "./controllers/formController";
+const app = express();
+
 
 dotenv.config();
-
+app.use(express.json());
 const numCPUs = os.cpus().length;
 
 if (cluster.isMaster) {
