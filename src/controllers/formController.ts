@@ -133,19 +133,19 @@ export const paymentCallback = async (req: Request, res: Response) => {
         { formData, cartItems, totalAmount, currency}
       );
 
-      return res.redirect(
-        `${FRONTEND_URL}/payment/success?reference=${reference}`
-      );
+      // return res.redirect(
+      //   `${FRONTEND_URL}/payment/success?reference=${reference}`
+      // );
     }
 
     payment.status = "failed";
     await payment.save();
 
-    return res.redirect(
-      `${FRONTEND_URL}/payment/failed?reference=${reference}`
-    );
+    // return res.redirect(
+    //   `${FRONTEND_URL}/payment/failed?reference=${reference}`
+    // );
   } catch (error: any) {
-    return res.redirect(`${FRONTEND_URL}/payment/failed`);
+    // return res.redirect(`${FRONTEND_URL}/payment/failed`);
   }
 };
 
