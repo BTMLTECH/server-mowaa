@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import { 
   exchangeRate, 
   initiatePayment, 
-  paymentCallback, 
+  // paymentCallback, 
   verifyPayment 
 } from "./controllers/formController";
 
