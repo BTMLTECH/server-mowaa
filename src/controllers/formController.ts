@@ -66,6 +66,8 @@ export const initiatePayment = async (req: Request, res: Response) => {
       }
     );
 
+    console.log("respons", response)
+
     const { authorization_url, reference } = response.data.data;
 
   
