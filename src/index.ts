@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import { exchangeRate, initiatePayment, paymentCallback, paystackWebhook, verifyPayment } from "./controllers/formController";
+import { exchangeRate, initiatePayment, paymentCallback, verifyPayment } from "./controllers/formController";
 const app = express();
 
 
@@ -30,9 +30,8 @@ if (cluster.isMaster) {
 
   // ✅ Allowed CORS origins
   const allowedOrigins = [
-      process.env.FRONTEND_URL
-    // "http://localhost:8080",
-    // "http://localhost:8082"
+      process.env.FRONTEND_URL,
+    "http://localhost:8080",
   ];
 
   app.use(
@@ -62,7 +61,6 @@ if (cluster.isMaster) {
   // ✅ API routes
   app.get("/api/exchange-rate", exchangeRate);
   app.post("/api/initiate-payment", initiatePayment);
-  app.post("/api/payment/webhook", express.json(), paystackWebhook);
   app.get("/api/payment/callback", paymentCallback);
   app.get("/api/verify-payment", verifyPayment);
 

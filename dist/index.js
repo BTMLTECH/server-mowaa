@@ -30,9 +30,8 @@ else {
     const app = (0, express_1.default)();
     // ✅ Allowed CORS origins
     const allowedOrigins = [
-        process.env.FRONTEND_URL
-        // "http://localhost:8080",
-        // "http://localhost:8082"
+        process.env.FRONTEND_URL,
+        "http://localhost:8080",
     ];
     app.use((0, cors_1.default)({
         origin: (origin, callback) => {
@@ -57,7 +56,6 @@ else {
     // ✅ API routes
     app.get("/api/exchange-rate", formController_1.exchangeRate);
     app.post("/api/initiate-payment", formController_1.initiatePayment);
-    app.post("/api/payment/webhook", express_1.default.json(), formController_1.paystackWebhook);
     app.get("/api/payment/callback", formController_1.paymentCallback);
     app.get("/api/verify-payment", formController_1.verifyPayment);
     // ✅ Start server
