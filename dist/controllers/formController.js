@@ -7,7 +7,7 @@ exports.verifyPayment = exports.paymentCallback = exports.initiatePayment = expo
 const axios_1 = __importDefault(require("axios"));
 const Payment_1 = __importDefault(require("../model/Payment"));
 const emailUtil_1 = require("../util/emailUtil");
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;
 const PAYSTACK_SECRET_KEY = (process.env.PAYSTACK_SECRET_KEY || "").trim();
 const exchangeRate = async (req, res) => {
