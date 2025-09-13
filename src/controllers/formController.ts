@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import axios from "axios";
 import Payment from "../model/Payment";
 import { sendEmail } from "../util/emailUtil";
+import { uploadToCloudinary } from "../util/cloudinary";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -26,58 +27,73 @@ export const exchangeRate = async (req: Request, res: Response) => {
 };
 
 
-
 export const initiatePayment = async (req: Request, res: Response) => {
   try {
-    const { formData, cartItems, totalAmount, currency } = req.body;
+    const parsedData = JSON.parse(req.body.data);
+    const { formData, cartItems, totalAmount, currency } = parsedData;
 
     if (!formData?.personalInfo?.email || !formData?.personalInfo?.name) {
-      return res.status(400).json({ error: "Customer email and name are required" });
+      return res
+        .status(400)
+        .json({ error: "Customer email and name are required" });
     }
 
-    let paystackAmount: number;
+    const uploadedFiles: Record<string, string> = {};
+    if (req.files && typeof req.files === "object") {
+  for (const [fieldName, fileArray] of Object.entries(req.files)) {
+    const file = (fileArray as Express.Multer.File[])[0];
+    if (file) {
+      const ext = file.originalname.split(".").pop()?.toLowerCase();
 
-    if (currency === "USD") {
-      paystackAmount = Math.round(totalAmount * 100); 
-    } else {
-      paystackAmount = Math.round(totalAmount * 100); 
+      const uploadResult = await uploadToCloudinary(
+        file.buffer,
+        `visa/${formData.personalInfo.name}`,
+        file.mimetype.startsWith("image") ? "image" : "raw",
+        `${fieldName}_${formData.personalInfo.name}_${Date.now()}`,
+        ext
+      );
+
+      uploadedFiles[fieldName] = uploadResult.secure_url;
     }
+  }
+}
 
-    const email = formData.personalInfo.email;
-    const name = formData.personalInfo.name;
 
-    // 🔹 Initialize Paystack transaction
+    formData.entryIntoNigeria = {
+      ...formData.entryIntoNigeria,
+      ...uploadedFiles,
+    };
+
+    // 4️⃣ Calculate Paystack amount
+    const paystackAmount = Math.round(totalAmount * 100);
+
     const response = await axios.post(
       "https://api.paystack.co/transaction/initialize",
       {
-        email,
+        email: formData.personalInfo.email,
         amount: paystackAmount,
         currency: currency || "NGN",
-        metadata: { name },
-        callback_url: `${BACKEND_URL}/api/payment/callback`,
+        metadata: { name: formData.personalInfo.name },
+        callback_url: `${process.env.BACKEND_URL}/api/payment/callback`,
       },
       {
         headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
           "Content-Type": "application/json",
         },
       }
     );
 
-    console.log("respons", response)
-
     const { authorization_url, reference } = response.data.data;
 
-  
     await Payment.create({
       reference,
       formData,
       cartItems,
-      totalAmount, 
+      totalAmount,
       currency: currency || "NGN",
       status: "pending",
     });
-
 
     res.json({ url: authorization_url, reference });
   } catch (error: any) {
@@ -87,7 +103,6 @@ export const initiatePayment = async (req: Request, res: Response) => {
 
 
 export const paymentCallback = async (req: Request, res: Response) => {
-
   try {
     let reference = req.query.reference || req.query.trxref;
 
@@ -95,7 +110,6 @@ export const paymentCallback = async (req: Request, res: Response) => {
     if (!reference || typeof reference !== "string") {
       return res.redirect(`${FRONTEND_URL}/payment/failed`);
     }
-
 
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
@@ -115,27 +129,24 @@ export const paymentCallback = async (req: Request, res: Response) => {
       payment.status = "success";
       await payment.save();
 
-        const { formData, cartItems, totalAmount, currency } = payment;
-
- 
+        const { formData, cartItems, totalAmount, currency } = payment.toObject();
       await sendEmail(
-        `${process.env.ADMIN_EMAIL}`,
+        process.env.ADMIN_EMAIL!,
         "New Form Submission - MOWAA",
         "formSubmission.ejs",
-        { formData, cartItems, totalAmount, currency  }
+        { formData, cartItems, totalAmount, currency },
       );
 
-    
+
       await sendEmail(
         formData.personalInfo.email,
         "Your MOWAA Booking Confirmation",
         "userConfirmation.ejs",
-        { formData, cartItems, totalAmount, currency}
+        { formData, cartItems, totalAmount, currency }
       );
 
       return res.redirect(
         `${FRONTEND_URL}/payment/success?reference=${reference}`
-        // `http://localhost:8080/payment/success?reference=${reference}`
       );
     }
 

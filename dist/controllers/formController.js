@@ -7,6 +7,7 @@ exports.verifyPayment = exports.paymentCallback = exports.initiatePayment = expo
 const axios_1 = __importDefault(require("axios"));
 const Payment_1 = __importDefault(require("../model/Payment"));
 const emailUtil_1 = require("../util/emailUtil");
+const cloudinary_1 = require("../util/cloudinary");
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;
 const PAYSTACK_SECRET_KEY = (process.env.PAYSTACK_SECRET_KEY || "").trim();
@@ -25,33 +26,42 @@ const exchangeRate = async (req, res) => {
 exports.exchangeRate = exchangeRate;
 const initiatePayment = async (req, res) => {
     try {
-        const { formData, cartItems, totalAmount, currency } = req.body;
+        const parsedData = JSON.parse(req.body.data);
+        const { formData, cartItems, totalAmount, currency } = parsedData;
         if (!formData?.personalInfo?.email || !formData?.personalInfo?.name) {
-            return res.status(400).json({ error: "Customer email and name are required" });
+            return res
+                .status(400)
+                .json({ error: "Customer email and name are required" });
         }
-        let paystackAmount;
-        if (currency === "USD") {
-            paystackAmount = Math.round(totalAmount * 100);
+        const uploadedFiles = {};
+        if (req.files && typeof req.files === "object") {
+            for (const [fieldName, fileArray] of Object.entries(req.files)) {
+                const file = fileArray[0];
+                if (file) {
+                    const ext = file.originalname.split(".").pop()?.toLowerCase();
+                    const uploadResult = await (0, cloudinary_1.uploadToCloudinary)(file.buffer, `visa/${formData.personalInfo.name}`, file.mimetype.startsWith("image") ? "image" : "raw", `${fieldName}_${formData.personalInfo.name}_${Date.now()}`, ext);
+                    uploadedFiles[fieldName] = uploadResult.secure_url;
+                }
+            }
         }
-        else {
-            paystackAmount = Math.round(totalAmount * 100);
-        }
-        const email = formData.personalInfo.email;
-        const name = formData.personalInfo.name;
-        // 🔹 Initialize Paystack transaction
+        formData.entryIntoNigeria = {
+            ...formData.entryIntoNigeria,
+            ...uploadedFiles,
+        };
+        // 4️⃣ Calculate Paystack amount
+        const paystackAmount = Math.round(totalAmount * 100);
         const response = await axios_1.default.post("https://api.paystack.co/transaction/initialize", {
-            email,
+            email: formData.personalInfo.email,
             amount: paystackAmount,
             currency: currency || "NGN",
-            metadata: { name },
-            callback_url: `${BACKEND_URL}/api/payment/callback`,
+            metadata: { name: formData.personalInfo.name },
+            callback_url: `${process.env.BACKEND_URL}/api/payment/callback`,
         }, {
             headers: {
-                Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+                Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
                 "Content-Type": "application/json",
             },
         });
-        console.log("respons", response);
         const { authorization_url, reference } = response.data.data;
         await Payment_1.default.create({
             reference,
@@ -87,12 +97,10 @@ const paymentCallback = async (req, res) => {
         if (data.status === "success") {
             payment.status = "success";
             await payment.save();
-            const { formData, cartItems, totalAmount, currency } = payment;
-            await (0, emailUtil_1.sendEmail)(`${process.env.ADMIN_EMAIL}`, "New Form Submission - MOWAA", "formSubmission.ejs", { formData, cartItems, totalAmount, currency });
+            const { formData, cartItems, totalAmount, currency } = payment.toObject();
+            await (0, emailUtil_1.sendEmail)(process.env.ADMIN_EMAIL, "New Form Submission - MOWAA", "formSubmission.ejs", { formData, cartItems, totalAmount, currency });
             await (0, emailUtil_1.sendEmail)(formData.personalInfo.email, "Your MOWAA Booking Confirmation", "userConfirmation.ejs", { formData, cartItems, totalAmount, currency });
-            return res.redirect(`${FRONTEND_URL}/payment/success?reference=${reference}`
-            // `http://localhost:8080/payment/success?reference=${reference}`
-            );
+            return res.redirect(`${FRONTEND_URL}/payment/success?reference=${reference}`);
         }
         payment.status = "failed";
         await payment.save();

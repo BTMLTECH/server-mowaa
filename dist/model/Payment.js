@@ -41,12 +41,20 @@ const CartItemSchema = new mongoose_1.Schema({
     category: { type: String, required: true },
     details: { type: String },
 }, { _id: false });
+const EntryIntoNigeriaSchema = new mongoose_1.Schema({
+    travelDocument: String,
+    otherDocumentDetails: String,
+    passportScan: String,
+    passportPhoto: String,
+    flightProof: String,
+}, { _id: false });
 const FormDataSchema = new mongoose_1.Schema({
     personalInfo: {
         name: { type: String, required: true },
         email: { type: String, required: true },
         phone: { type: String, required: true },
     },
+    entryIntoNigeria: EntryIntoNigeriaSchema,
     travelInfo: {
         arrivalDate: String,
         airline: String,

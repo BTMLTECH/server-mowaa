@@ -9,13 +9,11 @@ export const sendEmail = async (
   template: string,
   data: object
 ): Promise<boolean> => { 
-    console.log("emplate}`)", path.join(__dirname, `../mail/${template}`))
   try {
     const emailContent = await ejs.renderFile(
       path.join(__dirname, `../mail/${template}`), 
       data
     );
-    console.log("emailContent", emailContent)
 
     const emailResponse = await sendMailToUser({
       email,

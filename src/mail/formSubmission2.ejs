@@ -32,8 +32,6 @@
     th { background: #f0f0f0; text-align: left; }
     .section-title { background: #004080; color: #fff; padding: 10px; font-size: 16px; margin: 20px 0 10px 0; border-radius: 4px; }
     .total { font-weight: bold; font-size: 16px; color: #004080; text-align: right; }
-    a { color: #004080; text-decoration: none; }
-    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -84,34 +82,6 @@
       <tr><th>Comments</th><td><%= formData.comments || "N/A" %></td></tr>
     </table>
 
-    <div class="section-title">Uploaded Documents</div>
-    <table>
-      <tr>
-        <th>Passport Scan</th>
-        <td>
-          <% if (formData.entryIntoNigeria?.passportScan) { %>
-            <a href="<%= formData.entryIntoNigeria.passportScan %>" target="_blank">View Passport Scan</a>
-          <% } else { %> N/A <% } %>
-        </td>
-      </tr>
-      <tr>
-        <th>Passport Photo</th>
-        <td>
-          <% if (formData.entryIntoNigeria?.passportPhoto) { %>
-            <a href="<%= formData.entryIntoNigeria.passportPhoto %>" target="_blank">View Passport Photo</a>
-          <% } else { %> N/A <% } %>
-        </td>
-      </tr>
-      <tr>
-        <th>Flight Proof</th>
-        <td>
-          <% if (formData.entryIntoNigeria?.flightProof) { %>
-            <a href="<%= formData.entryIntoNigeria.flightProof %>" target="_blank">View Flight Proof</a>
-          <% } else { %> N/A <% } %>
-        </td>
-      </tr>
-    </table>
-
     <div class="section-title">Cart Items</div>
     <table>
       <thead>
@@ -140,3 +110,5 @@
   </div>
 </body>
 </html>
+
+

@@ -13,6 +13,16 @@ const CartItemSchema = new Schema(
   },
   { _id: false }
 );
+const EntryIntoNigeriaSchema = new Schema(
+  {
+    travelDocument: String,
+    otherDocumentDetails: String,
+    passportScan: String,  
+    passportPhoto: String, 
+    flightProof: String,   
+  },
+  { _id: false }
+);
 
 const FormDataSchema = new Schema(
   {
@@ -21,6 +31,7 @@ const FormDataSchema = new Schema(
       email: { type: String, required: true },
       phone: { type: String, required: true },
     },
+    entryIntoNigeria: EntryIntoNigeriaSchema,
     travelInfo: {
       arrivalDate: String,
       airline: String,

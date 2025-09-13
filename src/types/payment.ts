@@ -8,12 +8,22 @@ export interface CartItem {
   details?: string;
 }
 
+interface EntryIntoNigeriaSchema {
+   travelDocument: String,
+    otherDocumentDetails: String,
+    passportScan: String,  
+    passportPhoto: String, 
+    flightProof: String,   
+}
+
 export interface FormDatas {
   personalInfo: {
     name: string;
     email: string;
     phone: string;
   };
+    entryIntoNigeria: EntryIntoNigeriaSchema,
+
   travelInfo: {
     arrivalDate: string;
     airline: string;

@@ -8,10 +8,8 @@ const ejs_1 = __importDefault(require("ejs"));
 const path_1 = __importDefault(require("path"));
 const emailSender_1 = __importDefault(require("./emailSender"));
 const sendEmail = async (email, subject, template, data) => {
-    console.log("emplate}`)", path_1.default.join(__dirname, `../mail/${template}`));
     try {
         const emailContent = await ejs_1.default.renderFile(path_1.default.join(__dirname, `../mail/${template}`), data);
-        console.log("emailContent", emailContent);
         const emailResponse = await (0, emailSender_1.default)({
             email,
             subject,
