@@ -1,10 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
+    "target": "ES2022",                         
+    "module": "NodeNext",                     
+    "moduleResolution": "NodeNext",             
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "dist"
+    "allowSyntheticDefaultImports": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "resolveJsonModule": true,               
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   },
-  "include": ["src", "scripts"],
+  "include": ["src/**/*"]
 }
