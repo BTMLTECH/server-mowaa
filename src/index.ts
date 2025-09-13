@@ -69,6 +69,6 @@ if (cluster.isMaster) {
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
-   {};
+       console.log(`Worker ${process.pid} listening on port ${PORT}`);
   });
 }
