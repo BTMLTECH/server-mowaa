@@ -9,7 +9,6 @@ const Payment_1 = __importDefault(require("../model/Payment"));
 const emailUtil_1 = require("../util/emailUtil");
 const cloudinary_1 = require("../util/cloudinary");
 const FRONTEND_URL = process.env.FRONTEND_URL;
-const BACKEND_URL = process.env.BACKEND_URL;
 const PAYSTACK_SECRET_KEY = (process.env.PAYSTACK_SECRET_KEY || "").trim();
 const exchangeRate = async (req, res) => {
     try {
