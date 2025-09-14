@@ -1,3 +1,6 @@
+
+import cluster from "cluster";
+import os from "os";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -8,56 +11,67 @@ import visaUpload from "./util/visaUpload";
 
 dotenv.config();
 
-const app = express();
+const numCPUs = os.cpus().length;
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-];
+if (cluster.isMaster) {
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"), false);
-      }
-    },
-    credentials: true,
-  })
-);
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
 
-// MongoDB connection
-const MONGO_URI = process.env.MONGO_URI || "";
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch(err => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
+  cluster.on("exit", (worker, code, signal) => {
+    cluster.fork();
   });
+} else {
+  const app = express();
 
-// Routes
-app.get("/api/exchange-rate", exchangeRate);
+  // ✅ Allowed CORS origins
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+  ];
 
-app.post(
-  "/api/initiate-payment",
-  visaUpload.fields([
-    { name: "passportScan", maxCount: 1 },
-    { name: "passportPhoto", maxCount: 1 },
-    { name: "flightProof", maxCount: 1 },
-  ]),
-  initiatePayment
-);
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"), false);
+        }
+      },
+      credentials: true,
+    })
+  );
 
-app.use("/api/payment", bodyParser.json());
-app.get("/api/payment/callback", paymentCallback);
-app.get("/api/verify-payment", verifyPayment);
 
-// ✅ PORT binding
-const PORT = parseInt(process.env.PORT || "5000", 10);
+  const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/btm_payjeje";
+  mongoose.connect(MONGO_URI)
+    .then(() => {})
+    .catch(err => {
+      process.exit(1);
+    });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server listening on http://0.0.0.0:${PORT}`);
-});
+  // ✅ API routes
+  app.get("/api/exchange-rate", exchangeRate);
+
+  app.post(
+    "/api/initiate-payment",
+    visaUpload.fields([
+      { name: "passportScan", maxCount: 1 },
+      { name: "passportPhoto", maxCount: 1 },
+      { name: "flightProof", maxCount: 1 },
+    ]),
+    initiatePayment
+  );
+
+  // These endpoints can use JSON parsing since they don’t upload files
+  app.use("/api/payment", bodyParser.json());
+  app.get("/api/payment/callback", paymentCallback);
+  app.get("/api/verify-payment", verifyPayment);
+
+  // ✅ Start server
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Worker ${process.pid} started, listening on port ${PORT}`);
+  });
+}
