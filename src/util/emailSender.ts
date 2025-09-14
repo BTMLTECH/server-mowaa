@@ -20,13 +20,13 @@ export const sendMailToUser = async (
   try {
     // Build transporterz
     const transporter: Transporter = nodemailer.createTransport({
-      host: process.env.SMPT_HOST,
-      port: parseInt(process.env.SMPT_PORT || "587"),
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587"),
       secure: false,
-      service: process.env.SMPT_SERVICE,
+      service: process.env.SMTP_SERVICE,
       auth: {
-        user: process.env.SMPT_MAIL,
-        pass: process.env.SMPT_PASSWORD,
+        user: process.env.SMTP_MAIL,
+        pass: process.env.SMTP_PASSWORD,
       },
       tls: {
         rejectUnauthorized: false,
@@ -41,7 +41,7 @@ export const sendMailToUser = async (
 
     const html = await ejs.renderFile(templatePath, data);
 
-    const fromEmail = process.env.SMPT_MAIL;
+    const fromEmail = process.env.SMTP_MAIL;
     const displayName = data?.companyName || "MOWAA";
 
     const mailOptions = {
