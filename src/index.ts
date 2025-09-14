@@ -20,6 +20,7 @@ if (cluster.isMaster) {
   }
 
   cluster.on("exit", (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died. Restarting...`);
     cluster.fork();
   });
 } else {
@@ -27,6 +28,7 @@ if (cluster.isMaster) {
 
   // ✅ Allowed CORS origins
   const allowedOrigins = [
+    "http://localhost:8080",
     process.env.FRONTEND_URL,
   ];
 
@@ -46,8 +48,9 @@ if (cluster.isMaster) {
 
   const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/btm_payjeje";
   mongoose.connect(MONGO_URI)
-    .then(() => {})
+    .then(() => console.log("MongoDB connected"))
     .catch(err => {
+      console.error("MongoDB connection error:", err);
       process.exit(1);
     });
 
