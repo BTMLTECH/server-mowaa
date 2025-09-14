@@ -1,79 +1,9 @@
 
 
-// import nodemailer, { Transporter } from "nodemailer";
-// import ejs from "ejs";
-// import path from "path";
-// require("dotenv").config();
-
-// interface EmailOptions {
-//   email: string;
-//   subject: string;
-//   template: string;
-//   data: { [key: string]: any };
-// }
-
-// export const sendMailToUser = async (
-//   options: EmailOptions
-// ): Promise<{ accepted: string[]; rejected: string[] }> => {
-//   const { data, email, subject, template } = options;
-
-//   try {
-//     const transporter: Transporter = nodemailer.createTransport({
-//       host: process.env.SMPT_HOST,
-//       port: parseInt(process.env.SMPT_PORT || "587"),
-//       secure: false,
-//       service: process.env.SMPT_SERVICE,
-//       auth: {
-//         user: process.env.SMPT_MAIL,
-//         pass: process.env.SMPT_PASSWORD,
-//       },
-//       tls: {
-//         rejectUnauthorized: false,
-//       },
-//       logger: true,
-//       debug: true,
-//     });
-
-
-//     // Render template
-//     const templatePath = path.join(__dirname, "../mail", template);
-
-//     const html = await ejs.renderFile(templatePath, data);
-
-//     const fromEmail = process.env.SMPT_MAIL;
-//     const displayName = data?.companyName || "MOWAA";
-
-//     const mailOptions = {
-//       from: `"${displayName}" <${fromEmail}>`,
-//       to: email,
-//       cc: data?.cc || undefined, 
-//       subject,
-//       html,
-//     };
-
-//     const info = await transporter.sendMail(mailOptions);
-
-//     return {
-//       accepted: info.accepted || [],
-//       rejected: info.rejected || [],
-//     };
-//   } catch (error) {
-//     return {
-//       accepted: [],
-//       rejected: [email],
-//     };
-//   }
-// };
-
-// export default sendMailToUser;
-
-
 import nodemailer, { Transporter } from "nodemailer";
 import ejs from "ejs";
 import path from "path";
-import dotenv from "dotenv";
-
-dotenv.config();
+require("dotenv").config();
 
 interface EmailOptions {
   email: string;
@@ -85,17 +15,18 @@ interface EmailOptions {
 export const sendMailToUser = async (
   options: EmailOptions
 ): Promise<{ accepted: string[]; rejected: string[] }> => {
-  const { email, subject, template, data } = options;
+  const { data, email, subject, template } = options;
 
   try {
-    // Create transporter for cPanel SMTP
+    // Build transporterz
     const transporter: Transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: false, // STARTTLS
+      host: process.env.SMPT_HOST,
+      port: parseInt(process.env.SMPT_PORT || "587"),
+      secure: false,
+      service: process.env.SMPT_SERVICE,
       auth: {
-        user: process.env.SMTP_MAIL,
-        pass: process.env.SMTP_PASSWORD,
+        user: process.env.SMPT_MAIL,
+        pass: process.env.SMPT_PASSWORD,
       },
       tls: {
         rejectUnauthorized: false,
@@ -104,18 +35,19 @@ export const sendMailToUser = async (
       debug: true,
     });
 
-    // Render EJS template
+
+    // Render template
     const templatePath = path.join(__dirname, "../mail", template);
+
     const html = await ejs.renderFile(templatePath, data);
 
-    // Compose email
-    const fromEmail = process.env.SMTP_MAIL;
+    const fromEmail = process.env.SMPT_MAIL;
     const displayName = data?.companyName || "MOWAA";
 
     const mailOptions = {
       from: `"${displayName}" <${fromEmail}>`,
       to: email,
-      cc: data?.cc || undefined,
+      cc: data?.cc || undefined, 
       subject,
       html,
     };
@@ -123,14 +55,11 @@ export const sendMailToUser = async (
     // Send email
     const info = await transporter.sendMail(mailOptions);
 
-    console.log("Email sent:", info);
-
     return {
       accepted: info.accepted || [],
       rejected: info.rejected || [],
     };
   } catch (error) {
-    console.error("Error sending email:", error);
     return {
       accepted: [],
       rejected: [email],
@@ -139,3 +68,5 @@ export const sendMailToUser = async (
 };
 
 export default sendMailToUser;
+
+
