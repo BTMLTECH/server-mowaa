@@ -1,6 +1,3 @@
-
-import cluster from "cluster";
-import os from "os";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -11,64 +8,56 @@ import visaUpload from "./util/visaUpload";
 
 dotenv.config();
 
-const numCPUs = os.cpus().length;
+const app = express();
 
-if (cluster.isMaster) {
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+];
 
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
+    credentials: true,
+  })
+);
 
-  cluster.on("exit", (worker, code, signal) => {
-    cluster.fork();
+// MongoDB connection
+const MONGO_URI = process.env.MONGO_URI || "";
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch(err => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
   });
-} else {
-  const app = express();
 
-  const allowedOrigins = [
-    process.env.FRONTEND_URL,
-  ];
+// Routes
+app.get("/api/exchange-rate", exchangeRate);
 
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"), false);
-        }
-      },
-      credentials: true,
-    })
-  );
+app.post(
+  "/api/initiate-payment",
+  visaUpload.fields([
+    { name: "passportScan", maxCount: 1 },
+    { name: "passportPhoto", maxCount: 1 },
+    { name: "flightProof", maxCount: 1 },
+  ]),
+  initiatePayment
+);
 
+app.use("/api/payment", bodyParser.json());
+app.get("/api/payment/callback", paymentCallback);
+app.get("/api/verify-payment", verifyPayment);
 
-  const MONGO_URI = process.env.MONGO_URI || "";
-  mongoose.connect(MONGO_URI)
-    .then(() => {})
-    .catch(err => {
-      process.exit(1);
-    });
+// ✅ PORT binding
+const PORT = parseInt(process.env.PORT || "5000", 10);
 
-  // ✅ API routes
-  app.get("/api/exchange-rate", exchangeRate);
-
-  app.post(
-    "/api/initiate-payment",
-    visaUpload.fields([
-      { name: "passportScan", maxCount: 1 },
-      { name: "passportPhoto", maxCount: 1 },
-      { name: "flightProof", maxCount: 1 },
-    ]),
-    initiatePayment
-  );
-
-  app.use("/api/payment", bodyParser.json());
-  app.get("/api/payment/callback", paymentCallback);
-  app.get("/api/verify-payment", verifyPayment);
-
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-       console.log(`Worker ${process.pid} listening on port ${PORT}`);
-  });
-}
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server listening on http://0.0.0.0:${PORT}`);
+});
