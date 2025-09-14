@@ -1,39 +1,33 @@
-import ejs from 'ejs';
-import path from 'path';
-import sendMailToUser from './emailSender';
-
+// sendEmail.ts
+import ejs from "ejs";
+import path from "path";
+import sendMailToUser from "./emailSender";
 
 export const sendEmail = async (
   email: string,
   subject: string,
   template: string,
   data: object
-): Promise<boolean> => { 
-    console.log("emplate}`)", path.join(__dirname, `../mail/${template}`))
+): Promise<boolean> => {
   try {
-    const emailContent = await ejs.renderFile(
-      path.join(__dirname, `../mail/${template}`), 
-      data
-    );
-    console.log("emailContent", emailContent)
+    // Compile template for logging/debugging (optional)
+    const templatePath = path.join(__dirname, `../mail/${template}`);
+    console.log("Template path:", templatePath);
 
+    const emailContent = await ejs.renderFile(templatePath, data);
+    console.log("Rendered email content length:", emailContent.length);
+
+    // Send email
     const emailResponse = await sendMailToUser({
       email,
       subject,
-      template, 
-      data, 
-    })
-    if (emailResponse.accepted.length > 0) {
+      template,
+      data,
+    });
 
-      return true;  
-    } else {
-      return false; 
-    }
+    return emailResponse.accepted.length > 0;
   } catch (error) {
-    return false; 
+    console.error("Error in sendEmail:", error);
+    return false;
   }
 };
-
-
-
-

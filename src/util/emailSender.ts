@@ -1,5 +1,4 @@
-
-
+// emailSender.ts
 import nodemailer, { Transporter } from "nodemailer";
 import ejs from "ejs";
 import path from "path";
@@ -18,15 +17,14 @@ export const sendMailToUser = async (
   const { data, email, subject, template } = options;
 
   try {
-    // Build transporterz
+    // ✅ Corrected env variable names
     const transporter: Transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
+      host: process.env.SMTP_HOST, // was SMPT_HOST
       port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: false,
-      service: process.env.SMTP_SERVICE,
+      secure: false, // STARTTLS will be used
       auth: {
-        user: process.env.SMTP_MAIL,
-        pass: process.env.SMTP_PASSWORD,
+        user: process.env.SMTP_MAIL, // was SMPT_MAIL
+        pass: process.env.SMTP_PASSWORD, // was SMPT_PASSWORD
       },
       tls: {
         rejectUnauthorized: false,
@@ -35,10 +33,8 @@ export const sendMailToUser = async (
       debug: true,
     });
 
-
     // Render template
     const templatePath = path.join(__dirname, "../mail", template);
-
     const html = await ejs.renderFile(templatePath, data);
 
     const fromEmail = process.env.SMTP_MAIL;
@@ -47,7 +43,7 @@ export const sendMailToUser = async (
     const mailOptions = {
       from: `"${displayName}" <${fromEmail}>`,
       to: email,
-      cc: data?.cc || undefined, 
+      cc: data?.cc || undefined,
       subject,
       html,
     };
@@ -60,13 +56,12 @@ export const sendMailToUser = async (
       rejected: info.rejected || [],
     };
   } catch (error) {
+    console.error("Error in sendMailToUser:", error);
     return {
       accepted: [],
-      rejected: [email],
+      rejected: [options.email],
     };
   }
 };
 
 export default sendMailToUser;
-
-
