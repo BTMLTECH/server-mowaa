@@ -27,6 +27,7 @@ export const exchangeRate = async (req: Request, res: Response) => {
 
 export const initiatePayment = async (req: Request, res: Response) => {
   try {
+    console.log("first, ", req.body)
     const parsedData = JSON.parse(req.body.data);
     const { formData, cartItems, totalAmount, currency } = parsedData;
 
