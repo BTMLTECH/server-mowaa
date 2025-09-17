@@ -22,6 +22,7 @@ export const sendMailToUser = async (
       host: process.env.SMTP_HOST, // was SMPT_HOST
       port: parseInt(process.env.SMTP_PORT || "587"),
       secure: false, // STARTTLS will be used
+      service: process.env.SMPT_SERVICE,
       auth: {
         user: process.env.SMTP_MAIL, // was SMPT_MAIL
         pass: process.env.SMTP_PASSWORD, // was SMPT_PASSWORD

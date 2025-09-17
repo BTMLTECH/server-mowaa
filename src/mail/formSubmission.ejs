@@ -1,142 +1,306 @@
-<%
-  // ✅ Determine ISO currency code for Intl.NumberFormat
-  const currencyCode = currency === "USD" ? "USD" : currency === "NGN" ? "NGN" : currency;
-
-  // ✅ Currency-aware number formatter
-  const formatCurrency = (amount) => {
-    try {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: currencyCode,
-        minimumFractionDigits: 2,
-      }).format(amount);
-    } catch (err) {
-      // fallback
-      const symbol = currency === "USD" ? "$" : currency === "NGN" ? "₦" : currency;
-      return symbol + (amount?.toLocaleString() || "0.00");
-    }
+<% const currencyCode=currency==="USD" ? "USD" : currency==="NGN" ? "NGN" : currency; const formatCurrency=(amount)=> {
+  try {
+  return new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: currencyCode,
+  minimumFractionDigits: 2,
+  }).format(amount);
+  } catch (err) {
+  const symbol =
+  currency === "USD" ? "$" :
+  currency === "NGN" ? "₦" : currency;
+  return symbol + ((amount && amount.toLocaleString) ? amount.toLocaleString() : "0.00");
+  }
   };
-%>
+  %>
 
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>MOWAA Form Submission</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; color: #333; }
-    .container { max-width: 700px; margin: auto; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h2 { color: #004080; border-bottom: 2px solid #eee; padding-bottom: 8px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { padding: 10px; border: 1px solid #ddd; font-size: 14px; }
-    th { background: #f0f0f0; text-align: left; }
-    .section-title { background: #004080; color: #fff; padding: 10px; font-size: 16px; margin: 20px 0 10px 0; border-radius: 4px; }
-    .total { font-weight: bold; font-size: 16px; color: #004080; text-align: right; }
-    a { color: #004080; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>📝 New MOWAA Form Submission</h2>
+  <!DOCTYPE html>
+  <html>
 
-    <div class="section-title">Personal Info</div>
-    <table>
-      <tr><th>Name</th><td><%= formData.personalInfo?.name || "N/A" %></td></tr>
-      <tr><th>Email</th><td><%= formData.personalInfo?.email || "N/A" %></td></tr>
-      <tr><th>Phone</th><td><%= formData.personalInfo?.phone || "N/A" %></td></tr>
-    </table>
+  <head>
+    <meta charset="UTF-8">
+    <title>MOWAA Form Submission</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f9f9f9;
+        padding: 20px;
+        color: #333;
+      }
 
-    <div class="section-title">Travel Info</div>
-    <table>
-      <tr><th>Airline</th><td><%= formData.travelInfo?.airline || "N/A" %></td></tr>
-      <tr><th>Arrival Date</th><td><%= formData.travelInfo?.arrivalDate || "N/A" %></td></tr>
-      <tr><th>Departure Date</th><td><%= formData.travelInfo?.departureDate || "N/A" %></td></tr>
-      <tr><th>Flight Number</th><td><%= formData.travelInfo?.flightNumber || "N/A" %></td></tr>
-      <tr><th>Arrival Time</th><td><%= formData.travelInfo?.arrivalTime || "N/A" %></td></tr>
-      <tr><th>Departure Time</th><td><%= formData.travelInfo?.departureTime || "N/A" %></td></tr>
-      <tr><th>Departure from Lagos</th><td><%= formData.travelInfo?.departureTimeFromLagos || "N/A" %></td></tr>
-    </table>
+      .container {
+        max-width: 700px;
+        margin: auto;
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
 
-    <div class="section-title">Services</div>
-    <ul>
-      <% if (formData.services && formData.services.length) { %>
-        <% formData.services.forEach(service => { %>
-          <li><%= service %></li>
-        <% }) %>
-      <% } else { %>
-        <li>No services selected</li>
-      <% } %>
-    </ul>
+      h2 {
+        color: #004080;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 8px;
+      }
 
-    <div class="section-title">Hotel & Accommodation</div>
-    <table>
-      <tr><th>Hotel</th><td><%= formData.hotel || "N/A" %></td></tr>
-      <tr><th>Room Type</th><td><%= formData.roomType || "N/A" %></td></tr>
-      <tr><th>Number of Nights</th><td><%= formData.numberOfNights || "N/A" %></td></tr>
-      <tr><th>Number of Rooms</th><td><%= formData.numberOfRooms || "N/A" %></td></tr>
-    </table>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
 
-    <div class="section-title">Additional Info</div>
-    <table>
-      <tr><th>Stay in Benin</th><td><%= formData.stayInBenin || "N/A" %></td></tr>
-      <tr><th>Duration</th><td><%= formData.beninDuration || "N/A" %></td></tr>
-      <tr><th>Comments</th><td><%= formData.comments || "N/A" %></td></tr>
-    </table>
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+      }
 
-    <div class="section-title">Uploaded Documents</div>
-    <table>
-      <tr>
-        <th>Passport Scan</th>
-        <td>
-          <% if (formData.entryIntoNigeria?.passportScan) { %>
-            <a href="<%= formData.entryIntoNigeria.passportScan %>" target="_blank">View Passport Scan</a>
-          <% } else { %> N/A <% } %>
-        </td>
-      </tr>
-      <tr>
-        <th>Passport Photo</th>
-        <td>
-          <% if (formData.entryIntoNigeria?.passportPhoto) { %>
-            <a href="<%= formData.entryIntoNigeria.passportPhoto %>" target="_blank">View Passport Photo</a>
-          <% } else { %> N/A <% } %>
-        </td>
-      </tr>
-      <tr>
-        <th>Flight Proof</th>
-        <td>
-          <% if (formData.entryIntoNigeria?.flightProof) { %>
-            <a href="<%= formData.entryIntoNigeria.flightProof %>" target="_blank">View Flight Proof</a>
-          <% } else { %> N/A <% } %>
-        </td>
-      </tr>
-    </table>
+      th {
+        background: #f0f0f0;
+        text-align: left;
+      }
 
-    <div class="section-title">Cart Items</div>
-    <table>
-      <thead>
+      .section-title {
+        background: #004080;
+        color: #fff;
+        padding: 10px;
+        font-size: 16px;
+        margin: 20px 0 10px 0;
+        border-radius: 4px;
+      }
+
+      .total {
+        font-weight: bold;
+        font-size: 16px;
+        color: #004080;
+        text-align: right;
+      }
+
+      a {
+        color: #004080;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>📝 New MOWAA Form Submission</h2>
+
+      <!-- Personal Info -->
+      <div class="section-title">Personal Info</div>
+      <table>
         <tr>
-          <th>Service</th>
-          <th>Category</th>
-          <th>Price (<%= currency %>)</th>
+          <th>Name</th>
+          <td>
+            <%= (formData.personalInfo && formData.personalInfo.name) || "N/A" %>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        <% if (cartItems && cartItems.length) { %>
-          <% cartItems.forEach(item => { %>
-            <tr>
-              <td><%= item.name %></td>
-              <td><%= item.category %></td>
-              <td><%= formatCurrency(item.price) %></td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr><td colspan="3">No items in cart</td></tr>
-        <% } %>
-      </tbody>
-    </table>
+        <tr>
+          <th>Email</th>
+          <td>
+            <%= (formData.personalInfo && formData.personalInfo.email) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Phone</th>
+          <td>
+            <%= (formData.personalInfo && formData.personalInfo.phone) || "N/A" %>
+          </td>
+        </tr>
+      </table>
 
-    <p class="total">Total: <%= formatCurrency(totalAmount) %></p>
-  </div>
-</body>
-</html>
+      <!-- Travel Info -->
+      <div class="section-title">Travel Info</div>
+      <table>
+        <tr>
+          <th>Airline</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.airline) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Arrival Date</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.arrivalDate) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Departure Date</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.departureDate) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Flight Number</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.flightNumber) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Arrival Time</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.arrivalTime) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Departure Time</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.departureTime) || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Departure from Lagos</th>
+          <td>
+            <%= (formData.travelInfo && formData.travelInfo.departureTimeFromLagos) || "N/A" %>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Services -->
+      <div class="section-title">Services</div>
+      <ul>
+        <% if (formData.services && formData.services.length) { %>
+          <% formData.services.forEach(function(service) { %>
+            <li>
+              <%= service %>
+            </li>
+            <% }) %>
+              <% } else { %>
+                <li>No services selected</li>
+                <% } %>
+      </ul>
+
+      <!-- Hotel Info -->
+      <div class="section-title">Hotel & Accommodation</div>
+      <table>
+        <tr>
+          <th>Hotel</th>
+          <td>
+            <%= formData.hotel || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Room Type</th>
+          <td>
+            <%= formData.roomType || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Number of Nights</th>
+          <td>
+            <%= formData.numberOfNights || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Number of Rooms</th>
+          <td>
+            <%= formData.numberOfRooms || "N/A" %>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Additional Info -->
+      <div class="section-title">Additional Info</div>
+      <table>
+        <tr>
+          <th>Stay in Benin</th>
+          <td>
+            <%= formData.stayInBenin || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Duration</th>
+          <td>
+            <%= formData.beninDuration || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Comments</th>
+          <td>
+            <%= formData.comments || "N/A" %>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Uploaded Docs -->
+      <div class="section-title">Uploaded Documents</div>
+      <table>
+        <tr>
+          <th>Passport Scan</th>
+          <td>
+            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.passportScan) { %>
+              <a href="<%= formData.entryIntoNigeria.passportScan %>" target="_blank">View Passport Scan</a>
+              <% } else { %> N/A <% } %>
+          </td>
+        </tr>
+        <tr>
+          <th>Passport Photo</th>
+          <td>
+            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.passportPhoto) { %>
+              <a href="<%= formData.entryIntoNigeria.passportPhoto %>" target="_blank">View Passport Photo</a>
+              <% } else { %> N/A <% } %>
+          </td>
+        </tr>
+        <tr>
+          <th>Flight Proof</th>
+          <td>
+            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.flightProof) { %>
+              <a href="<%= formData.entryIntoNigeria.flightProof %>" target="_blank">View Flight Proof</a>
+              <% } else { %> N/A <% } %>
+          </td>
+        </tr>
+        <tr>
+          <th>Signed Application Letter</th>
+          <td>
+            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.signedLetter) { %>
+              <a href="<%= formData.entryIntoNigeria.signedLetter %>" target="_blank">View Signed Application Letter</a>
+              <% } else { %> N/A <% } %>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Cart -->
+      <div class="section-title">Cart Items</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Category</th>
+            <th>Price (<%= currency %>)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (cartItems && cartItems.length) { %>
+            <% cartItems.forEach(function(item) { %>
+              <tr>
+                <td>
+                  <%= item.name %>
+                </td>
+                <td>
+                  <%= item.category %>
+                </td>
+                <td>
+                  <%= formatCurrency(item.price) %>
+                </td>
+              </tr>
+              <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="3">No items in cart</td>
+                  </tr>
+                  <% } %>
+        </tbody>
+      </table>
+
+      <p class="total">Total: <%= formatCurrency(totalAmount) %>
+      </p>
+    </div>
+  </body>
+
+  </html>

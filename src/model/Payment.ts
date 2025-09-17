@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { PaymentDocument } from "../types/payment";
 
-
-
 const CartItemSchema = new Schema(
   {
     id: { type: String, required: true },
@@ -17,9 +15,10 @@ const EntryIntoNigeriaSchema = new Schema(
   {
     travelDocument: String,
     otherDocumentDetails: String,
-    passportScan: String,  
-    passportPhoto: String, 
-    flightProof: String,   
+    passportScan: String,
+    passportPhoto: String,
+    flightProof: String,
+    signedLetter: String,
   },
   { _id: false }
 );
@@ -60,7 +59,11 @@ const PaymentSchema = new Schema<PaymentDocument>(
     cartItems: { type: [CartItemSchema], required: true },
     totalAmount: { type: Number, required: true },
     currency: { type: String, default: "NGN" },
-    status: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
+    status: {
+      type: String,
+      enum: ["pending", "success", "failed"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );

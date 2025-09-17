@@ -1,39 +1,74 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Your MOWAA Booking Confirmation</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; color: #333; }
-    .container { max-width: 700px; margin: auto; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h2 { color: #004080; }
-    .total { font-weight: bold; font-size: 16px; margin-top: 20px; color: #004080; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #004080;
+    }
+
+    .total {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 20px;
+      color: #004080;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h2>✅ Thank you, <%= formData.personalInfo.name %>!</h2>
+    <h2>✅ Thank you, <%= (formData.personalInfo && formData.personalInfo.name) || "Guest" %>!</h2>
     <p>We’ve received your booking details. Here’s a summary:</p>
 
-    <p><strong>Email:</strong> <%= formData.personalInfo.email %></p>
-    <p><strong>Phone:</strong> <%= formData.personalInfo.phone %></p>
+    <p><strong>Email:</strong>
+      <%= (formData.personalInfo && formData.personalInfo.email) || "N/A" %>
+    </p>
+    <p><strong>Phone:</strong>
+      <%= (formData.personalInfo && formData.personalInfo.phone) || "N/A" %>
+    </p>
 
     <h3>Selected Services:</h3>
     <ul>
-      <% cartItems.forEach(item => { %>
-        <li>
-          <%= item.name %> - 
-          <%= currency === "USD" ? "$" : "₦" %><%= item.price.toLocaleString() %>
-        </li>
-      <% }) %>
+      <% if (cartItems && cartItems.length) { %>
+        <% cartItems.forEach(function(item) { %>
+          <li>
+            <%= item.name %> -
+              <%= currency==="USD" ? "$" : "₦" %>
+                <%= (item.price && item.price.toLocaleString) ? item.price.toLocaleString() : "0.00" %>
+          </li>
+          <% }) %>
+            <% } else { %>
+              <li>No services selected</li>
+              <% } %>
     </ul>
 
     <p class="total">
-      Total: <%= currency === "USD" ? "$" : "₦" %><%= totalAmount.toLocaleString() %>
+      Total: <%= currency==="USD" ? "$" : "₦" %>
+        <%= (totalAmount && totalAmount.toLocaleString) ? totalAmount.toLocaleString() : "0.00" %>
     </p>
 
     <p>We’ll be in touch soon with next steps.</p>
     <p>— The MOWAA Team</p>
   </div>
 </body>
+
 </html>
