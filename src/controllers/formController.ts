@@ -94,64 +94,6 @@ export const initiatePayment = async (req: Request, res: Response) => {
   }
 };
 
-// export const paymentCallback = async (req: Request, res: Response) => {
-//   try {
-//     let reference = req.query.reference || req.query.trxref;
-
-//     if (Array.isArray(reference)) reference = reference[0];
-//     if (!reference || typeof reference !== "string") {
-//       return res.redirect(`${FRONTEND_URL}/payment/failed`);
-//     }
-
-//     const response = await axios.get(
-//       `https://api.paystack.co/transaction/verify/${reference}`,
-//       {
-//         headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
-//       }
-//     );
-
-//     const data = response.data.data;
-//     const payment = await Payment.findOne({ reference });
-
-//     if (!payment) {
-//       return res.redirect(`${FRONTEND_URL}/payment/failed`);
-//     }
-
-//     if (data.status === "success") {
-//       payment.status = "success";
-//       await payment.save();
-
-//         const { formData, cartItems, totalAmount, currency } = payment.toObject();
-//       await sendEmail(
-//         process.env.ADMIN_EMAIL!,
-//         "New Form Submission - MOWAA",
-//         "formSubmission.ejs",
-//         { formData, cartItems, totalAmount, currency },
-//       );
-
-//       await sendEmail(
-//         formData.personalInfo.email,
-//         "Your MOWAA Booking Confirmation",
-//         "userConfirmation.ejs",
-//         { formData, cartItems, totalAmount, currency }
-//       );
-
-//       return res.redirect(
-//         `${FRONTEND_URL}/payment/success?reference=${reference}`
-//       );
-//     }
-
-//     payment.status = "failed";
-//     await payment.save();
-
-//     return res.redirect(
-//       `${FRONTEND_URL}/payment/failed?reference=${reference}`
-//     );
-//   } catch (error: any) {
-//     return res.redirect(`${FRONTEND_URL}/payment/failed`);
-//   }
-// };
-
 export const paymentCallback = async (req: Request, res: Response) => {
   try {
     let reference = req.query.reference || req.query.trxref;

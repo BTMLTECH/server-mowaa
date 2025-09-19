@@ -30,7 +30,10 @@ if (cluster.isMaster) {
   const app = express();
 
   // ✅ Allowed CORS origins
-  const allowedOrigins = [process.env.FRONTEND_URL];
+  const allowedOrigins = [
+    // process.env.FRONTEND_URL,
+    "http://localhost:8080",
+  ];
 
   app.use(
     cors({

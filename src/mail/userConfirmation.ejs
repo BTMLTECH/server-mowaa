@@ -1,74 +1,105 @@
-<!DOCTYPE html>
-<html>
+<% const currencyCode=currency==="USD" ? "USD" : currency==="NGN" ? "NGN" : currency; const formatCurrency=(amount)=> {
+  try {
+  return new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: currencyCode,
+  minimumFractionDigits: 2,
+  }).format(amount);
+  } catch (err) {
+  const symbol = currency === "USD" ? "$" : currency === "NGN" ? "₦" : currency;
+  return symbol + ((amount && amount.toLocaleString) ? amount.toLocaleString() : "0.00");
+  }
+  };
+  %>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Your MOWAA Booking Confirmation</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
-      color: #333;
-    }
+  <!DOCTYPE html>
+  <html>
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+  <head>
+    <meta charset="UTF-8">
+    <title>Your MOWAA Booking Confirmation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f9f9f9;
+        color: #333;
+      }
 
-    h2 {
-      color: #004080;
-    }
+      .container {
+        max-width: 700px;
+        margin: auto;
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
 
-    .total {
-      font-weight: bold;
-      font-size: 16px;
-      margin-top: 20px;
-      color: #004080;
-    }
-  </style>
-</head>
+      h2 {
+        color: #004080;
+      }
 
-<body>
-  <div class="container">
-    <h2>✅ Thank you, <%= (formData.personalInfo && formData.personalInfo.name) || "Guest" %>!</h2>
-    <p>We’ve received your booking details. Here’s a summary:</p>
+      h3 {
+        margin-top: 20px;
+        color: #004080;
+      }
 
-    <p><strong>Email:</strong>
-      <%= (formData.personalInfo && formData.personalInfo.email) || "N/A" %>
-    </p>
-    <p><strong>Phone:</strong>
-      <%= (formData.personalInfo && formData.personalInfo.phone) || "N/A" %>
-    </p>
+      .total {
+        font-weight: bold;
+        font-size: 16px;
+        margin-top: 20px;
+        color: #004080;
+      }
+    </style>
+  </head>
 
-    <h3>Selected Services:</h3>
-    <ul>
-      <% if (cartItems && cartItems.length) { %>
-        <% cartItems.forEach(function(item) { %>
-          <li>
-            <%= item.name %> -
-              <%= currency==="USD" ? "$" : "₦" %>
-                <%= (item.price && item.price.toLocaleString) ? item.price.toLocaleString() : "0.00" %>
-          </li>
-          <% }) %>
-            <% } else { %>
-              <li>No services selected</li>
-              <% } %>
-    </ul>
+  <body>
+    <div class="container">
+      <h2>✅ Thank you, <%= formData.personalInfo?.name || "Guest" %>!</h2>
+      <p>We’ve received your booking details. Here’s a summary:</p>
 
-    <p class="total">
-      Total: <%= currency==="USD" ? "$" : "₦" %>
-        <%= (totalAmount && totalAmount.toLocaleString) ? totalAmount.toLocaleString() : "0.00" %>
-    </p>
+      <p><strong>Email:</strong>
+        <%= formData.personalInfo?.email || "N/A" %>
+      </p>
+      <p><strong>Phone:</strong>
+        <%= formData.personalInfo?.phone || "N/A" %>
+      </p>
+      <p><strong>Requires Visa:</strong>
+        <%= formData.personalInfo?.requiresVisa || "N/A" %>
+      </p>
+      <p><strong>Country:</strong>
+        <%= formData.personalInfo?.country || "N/A" %>
+      </p>
 
-    <p>We’ll be in touch soon with next steps.</p>
-    <p>— The MOWAA Team</p>
-  </div>
-</body>
+      <h3>Selected Services:</h3>
+      <ul>
+        <% if (cartItems && cartItems.length) { %>
+          <% cartItems.forEach(function(item) { %>
+            <li>
+              <%= item.name %> - <%= formatCurrency(item.price) %>
+            </li>
+            <% }) %>
+              <% } else { %>
+                <li>No services selected</li>
+                <% } %>
+      </ul>
 
-</html>
+      <p class="total">Total: <%= formatCurrency(totalAmount) %>
+      </p>
+
+      <h3>Hotel</h3>
+      <p><strong>Hotel:</strong>
+        <%= formData.hotel || "N/A" %>
+      </p>
+
+      <h3>Additional Info</h3>
+      <p><strong>Comments:</strong>
+        <%= formData.comments || "N/A" %>
+      </p>
+
+      <p>We’ll be in touch soon with next steps.</p>
+      <p>— The MOWAA Team</p>
+    </div>
+  </body>
+
+  </html>

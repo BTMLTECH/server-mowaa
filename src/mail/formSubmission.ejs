@@ -6,9 +6,7 @@
   minimumFractionDigits: 2,
   }).format(amount);
   } catch (err) {
-  const symbol =
-  currency === "USD" ? "$" :
-  currency === "NGN" ? "₦" : currency;
+  const symbol = currency === "USD" ? "$" : currency === "NGN" ? "₦" : currency;
   return symbol + ((amount && amount.toLocaleString) ? amount.toLocaleString() : "0.00");
   }
   };
@@ -98,19 +96,31 @@
         <tr>
           <th>Name</th>
           <td>
-            <%= (formData.personalInfo && formData.personalInfo.name) || "N/A" %>
+            <%= formData.personalInfo?.name || "N/A" %>
           </td>
         </tr>
         <tr>
           <th>Email</th>
           <td>
-            <%= (formData.personalInfo && formData.personalInfo.email) || "N/A" %>
+            <%= formData.personalInfo?.email || "N/A" %>
           </td>
         </tr>
         <tr>
           <th>Phone</th>
           <td>
-            <%= (formData.personalInfo && formData.personalInfo.phone) || "N/A" %>
+            <%= formData.personalInfo?.phone || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Requires Visa</th>
+          <td>
+            <%= formData.personalInfo?.requiresVisa || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Country</th>
+          <td>
+            <%= formData.personalInfo?.country || "N/A" %>
           </td>
         </tr>
       </table>
@@ -119,45 +129,33 @@
       <div class="section-title">Travel Info</div>
       <table>
         <tr>
-          <th>Airline</th>
+          <th>Arrival in Lagos</th>
           <td>
-            <%= (formData.travelInfo && formData.travelInfo.airline) || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Arrival Date</th>
-          <td>
-            <%= (formData.travelInfo && formData.travelInfo.arrivalDate) || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Departure Date</th>
-          <td>
-            <%= (formData.travelInfo && formData.travelInfo.departureDate) || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Flight Number</th>
-          <td>
-            <%= (formData.travelInfo && formData.travelInfo.flightNumber) || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Arrival Time</th>
-          <td>
-            <%= (formData.travelInfo && formData.travelInfo.arrivalTime) || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Departure Time</th>
-          <td>
-            <%= (formData.travelInfo && formData.travelInfo.departureTime) || "N/A" %>
+            Date: <%= formData.travelInfo?.arrivalLagosDate || "N/A" %><br>
+              Time: <%= formData.travelInfo?.arrivalLagosTime || "N/A" %><br>
+                Airline: <%= formData.travelInfo?.arrivalLagosAirline || "N/A" %><br>
+                  Flight: <%= formData.travelInfo?.arrivalLagosFlight || "N/A" %>
           </td>
         </tr>
         <tr>
           <th>Departure from Lagos</th>
           <td>
-            <%= (formData.travelInfo && formData.travelInfo.departureTimeFromLagos) || "N/A" %>
+            Date: <%= formData.travelInfo?.departureLagosDate || "N/A" %><br>
+              Time: <%= formData.travelInfo?.departureLagosTime || "N/A" %><br>
+                Airline: <%= formData.travelInfo?.departureLagosAirline || "N/A" %><br>
+                  Flight: <%= formData.travelInfo?.departureLagosFlight || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Arrival in Benin</th>
+          <td>
+            <%= formData.travelInfo?.arrivalBeninDate || "N/A" %>
+          </td>
+        </tr>
+        <tr>
+          <th>Departure from Benin</th>
+          <td>
+            <%= formData.travelInfo?.departureBeninDate || "N/A" %>
           </td>
         </tr>
       </table>
@@ -177,7 +175,7 @@
       </ul>
 
       <!-- Hotel Info -->
-      <div class="section-title">Hotel & Accommodation</div>
+      <div class="section-title">Hotel</div>
       <table>
         <tr>
           <th>Hotel</th>
@@ -185,41 +183,11 @@
             <%= formData.hotel || "N/A" %>
           </td>
         </tr>
-        <tr>
-          <th>Room Type</th>
-          <td>
-            <%= formData.roomType || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Number of Nights</th>
-          <td>
-            <%= formData.numberOfNights || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Number of Rooms</th>
-          <td>
-            <%= formData.numberOfRooms || "N/A" %>
-          </td>
-        </tr>
       </table>
 
       <!-- Additional Info -->
       <div class="section-title">Additional Info</div>
       <table>
-        <tr>
-          <th>Stay in Benin</th>
-          <td>
-            <%= formData.stayInBenin || "N/A" %>
-          </td>
-        </tr>
-        <tr>
-          <th>Duration</th>
-          <td>
-            <%= formData.beninDuration || "N/A" %>
-          </td>
-        </tr>
         <tr>
           <th>Comments</th>
           <td>
@@ -234,7 +202,7 @@
         <tr>
           <th>Passport Scan</th>
           <td>
-            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.passportScan) { %>
+            <% if (formData.entryIntoNigeria?.passportScan) { %>
               <a href="<%= formData.entryIntoNigeria.passportScan %>" target="_blank">View Passport Scan</a>
               <% } else { %> N/A <% } %>
           </td>
@@ -242,7 +210,7 @@
         <tr>
           <th>Passport Photo</th>
           <td>
-            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.passportPhoto) { %>
+            <% if (formData.entryIntoNigeria?.passportPhoto) { %>
               <a href="<%= formData.entryIntoNigeria.passportPhoto %>" target="_blank">View Passport Photo</a>
               <% } else { %> N/A <% } %>
           </td>
@@ -250,7 +218,7 @@
         <tr>
           <th>Flight Proof</th>
           <td>
-            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.flightProof) { %>
+            <% if (formData.entryIntoNigeria?.flightProof) { %>
               <a href="<%= formData.entryIntoNigeria.flightProof %>" target="_blank">View Flight Proof</a>
               <% } else { %> N/A <% } %>
           </td>
@@ -258,7 +226,7 @@
         <tr>
           <th>Signed Application Letter</th>
           <td>
-            <% if (formData.entryIntoNigeria && formData.entryIntoNigeria.signedLetter) { %>
+            <% if (formData.entryIntoNigeria?.signedLetter) { %>
               <a href="<%= formData.entryIntoNigeria.signedLetter %>" target="_blank">View Signed Application Letter</a>
               <% } else { %> N/A <% } %>
           </td>
